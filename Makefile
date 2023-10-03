@@ -11,6 +11,8 @@ start:
 SESSION ?= $(CURDIR)/app_debugging
 OWASP_ZAP := /Applications/OWASP\ ZAP.app
 RUN_ZAP_COMMAND := open $(OWASP_ZAP) --args
+RUNNING_ZAP := ps -Ao pid=,command= | awk -v zapcmd=$(OWASP_ZAP) '$$0 ~ zapcmd {print $$1;exit}'
+
 # Start a new session or use existing session
 ifneq "$(wildcard $(SESSION))" ""
 # Given session is an existing file
@@ -49,10 +51,10 @@ quit-zap:
 	@if test -f zap.pid; then \
 	   read PID<zap.pid; rm zap.pid; \
 	   kill $${PID} 2>/dev/null || echo "Failed to close ZAP (pid = $${PID})" >&2; \
-	   PID=`$(runningzap)`; echo "Trying again with running ZAP (pid = $${PID})" >&2; \
+	   PID=`$(RUNNING_ZAP)`; echo "Trying again with running ZAP (pid = $${PID})" >&2; \
 	   kill $${PID} 2>/dev/null; \
 	 else \
-	   kill `$(runningzap)` 2>/dev/null; \
+	   kill `$(RUNNING_ZAP)` 2>/dev/null; \
 	 fi; unset -v PID
 
 restart: shutdown start
@@ -73,21 +75,15 @@ urls.conf:
 	@while read -r url && test "$${url}"; do echo "$${url}" >> urls.conf; done
 
 zap.pid:
-	@PID=`$(runningzap)`; \
+	@PID=`$(RUNNING_ZAP)`; \
 	 if test $${PID}; then \
 	   if test ! -f zap.pid || test $${PID} != $(<zap.pid); then \
 	     echo $${PID} > zap.pid; \
 	   fi; \
 	 else \
-	   $(RUN_ZAP_COMMAND) && $(runningzap) > zap.pid; \
+	   $(RUN_ZAP_COMMAND) && $(RUNNING_ZAP) > zap.pid; \
 	 fi; unset -v PID
 
 server.pid:
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
 	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PORT)/debugging.pac
-
-# The '\[]' after the command pattern prevents grep from finding itself
-# (it's quoted so the shell doesn't expand it, and escaped so grep doesn't complain)
-define runningzap
-ps -Ao pid=,command= | grep -m1 $(OWASP_ZAP)'\[]' | awk '{print $$1}'
-endef
