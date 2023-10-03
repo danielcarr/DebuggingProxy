@@ -1,4 +1,4 @@
-.PHONY: start stop shutdown restart clean
+.PHONY: start stop shutdown stop-server quit-zap restart clean
 
 PORT ?= 8888
 NETWORK ?= Wi-Fi
@@ -34,10 +34,18 @@ endif
 
 start: debugging.pac zap.pid server.pid
 
+shutdown: stop quit-zap stop-server
+
 stop:
 	@networksetup -setautoproxystate "$(NETWORK)" off
 
-shutdown: stop
+stop-server:
+	@if test -e server.pid; then \
+	   read PID<server.pid; \
+	   kill $${PID} 2>/dev/null && rm server.pid || echo "Failed to stop server (pid = $${PID})" >&2; \
+	 fi; unset -v PID
+
+quit-zap:
 	@if test -e zap.pid; then \
 	   read PID<zap.pid; \
 	   kill $${PID} 2>/dev/null && rm zap.pid || echo "Failed to close ZAP (pid = $${PID})" >&2; \
@@ -46,10 +54,6 @@ shutdown: stop
 	   kill $${PID} 2>/dev/null && rm zap.pid; \
 	 else \
 	   kill `$(runningzap)` 2>/dev/null; \
-	 fi; unset -v PID
-	@if test -e server.pid; then \
-	   read PID<server.pid; \
-	   kill $${PID} 2>/dev/null && rm server.pid || echo "Failed to stop server (pid = $${PID})" >&2; \
 	 fi; unset -v PID
 
 restart: shutdown start
