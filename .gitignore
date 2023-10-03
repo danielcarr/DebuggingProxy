@@ -1,0 +1,20 @@
+# ZAP Session Data
+*.session
+*.session.data
+*.session.lck
+*.session.log
+*.session.properties
+*.session.script
+*.session.tmp
+
+# Certificates
+*.cer
+
+# Generated Files
+urls.conf
+debugging.pac
+server.pid
+zap.pid
+
+# macOS Metadata
+.DS_Store
