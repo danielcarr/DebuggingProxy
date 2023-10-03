@@ -74,7 +74,11 @@ urls.conf:
 	@while read -r url && test "$${url}"; do echo "$${url}" >> urls.conf; done
 
 zap.pid:
-	@if test ! -e zap.pid; then $(RUN_ZAP_COMMAND); fi && $(runningzap) > "zap.pid"
+	@PID=`$(runningzap)`; \
+	 if test $${PID}; \
+	 then echo $${PID} > zap.pid; \
+	 else $(RUN_ZAP_COMMAND) && $(runningzap) > zap.pid; \
+	 fi; unset -v PID
 
 server.pid:
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
