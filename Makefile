@@ -87,6 +87,8 @@ server.pid:
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
 	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PORT)/debugging.pac
 
+# The '\[]' after the command pattern prevents grep from finding itself
+# (it's quoted so the shell doesn't expand it, and escaped so grep doesn't complain)
 define runningzap
-ps -Ao pid=,command= | grep -m1 ${OWASP_ZAP} | awk '{print $$1}'
+ps -Ao pid=,command= | grep -m1 $(OWASP_ZAP)'\[]' | awk '{print $$1}'
 endef
