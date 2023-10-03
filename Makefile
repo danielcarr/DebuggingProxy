@@ -40,13 +40,13 @@ stop:
 	@networksetup -setautoproxystate "$(NETWORK)" off
 
 stop-server:
-	@if test -e server.pid; then \
+	@if test -f server.pid; then \
 	   read PID<server.pid; \
 	   kill $${PID} 2>/dev/null && rm server.pid || echo "Failed to stop server (pid = $${PID})" >&2; \
 	 fi; unset -v PID
 
 quit-zap:
-	@if test -e zap.pid; then \
+	@if test -f zap.pid; then \
 	   read PID<zap.pid; rm zap.pid; \
 	   kill $${PID} 2>/dev/null || echo "Failed to close ZAP (pid = $${PID})" >&2; \
 	   PID=`$(runningzap)`; echo "Trying again with running ZAP (pid = $${PID})" >&2; \
