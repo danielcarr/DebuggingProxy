@@ -47,11 +47,10 @@ stop-server:
 
 quit-zap:
 	@if test -e zap.pid; then \
-	   read PID<zap.pid; \
-	   kill $${PID} 2>/dev/null && rm zap.pid || echo "Failed to close ZAP (pid = $${PID})" >&2; \
-	   PID=`$(runningzap)`; \
-	   echo "Trying again with running ZAP (pid = $${PID})" >&2; \
-	   kill $${PID} 2>/dev/null && rm zap.pid; \
+	   read PID<zap.pid; rm zap.pid; \
+	   kill $${PID} 2>/dev/null || echo "Failed to close ZAP (pid = $${PID})" >&2; \
+	   PID=`$(runningzap)`; echo "Trying again with running ZAP (pid = $${PID})" >&2; \
+	   kill $${PID} 2>/dev/null; \
 	 else \
 	   kill `$(runningzap)` 2>/dev/null; \
 	 fi; unset -v PID
