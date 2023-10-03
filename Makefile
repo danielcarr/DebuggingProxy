@@ -75,9 +75,12 @@ urls.conf:
 
 zap.pid:
 	@PID=`$(runningzap)`; \
-	 if test $${PID}; \
-	 then echo $${PID} > zap.pid; \
-	 else $(RUN_ZAP_COMMAND) && $(runningzap) > zap.pid; \
+	 if test $${PID}; then \
+	   if test ! -f zap.pid || test $${PID} != $(<zap.pid); then \
+	     echo $${PID} > zap.pid; \
+	   fi; \
+	 else \
+	   $(RUN_ZAP_COMMAND) && $(runningzap) > zap.pid; \
 	 fi; unset -v PID
 
 server.pid:
