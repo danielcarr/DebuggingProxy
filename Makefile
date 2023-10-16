@@ -11,7 +11,7 @@ start:
 SESSION ?= $(CURDIR)/app_debugging
 OWASP_ZAP := /Applications/OWASP\ ZAP.app
 RUN_ZAP_COMMAND := open $(OWASP_ZAP) --args
-RUNNING_ZAP := ps -Ao pid=,command= | awk -v zapcmd=$(OWASP_ZAP) '$$0 ~ zapcmd {print $$1;exit}'
+RUNNING_ZAP := ps -Ao pid=,command= | awk -v zapcmd=$(OWASP_ZAP) '$$0 ~ zapcmd && $$2 != "awk" {print $$1;exit}'
 
 # Start a new session or use existing session
 ifneq "$(wildcard $(SESSION))" ""
