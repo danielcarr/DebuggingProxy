@@ -1,5 +1,6 @@
 # ZAP Session Data
 *.session
+*.session.backup
 *.session.data
 *.session.lck
 *.session.log
