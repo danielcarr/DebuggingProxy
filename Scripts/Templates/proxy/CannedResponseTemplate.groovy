@@ -7,7 +7,7 @@ The response of the endpoint that ends in `pattern` will be replaced with `body`
 boolean proxyResponse(HttpMessage msg) {
     pattern = ''
     url = msg.getRequestHeader().getURI().toString()
-    if (url ~== $/.*/${pattern}/$) {
+    if (url ==~ $/.*$/$pattern/$) {
         body = $/\
 
         /$.stripIndent()
