@@ -74,7 +74,7 @@ urls.conf:
 	one entry per line, terminating with a blank line:"
 	@while read -r url && test "$${url}"; do echo "$${url}" >> urls.conf; done
 
-zap.pid:
+zap.pid: .FORCE
 	@PID=`$(RUNNING_ZAP)`; \
 	 if test $${PID}; then \
 	   if test ! -f zap.pid || test $${PID} != $$(<zap.pid); then \
@@ -87,3 +87,5 @@ zap.pid:
 server.pid:
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
 	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PORT)/debugging.pac
+
+.FORCE:
