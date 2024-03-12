@@ -9,7 +9,7 @@ PROXY_ADDRESS := $(PROXY_HOST):$(PROXY_PORT)
 
 start:
 SESSION ?= $(CURDIR)/app_debugging
-OWASP_ZAP := /Applications/OWASP\ ZAP.app
+OWASP_ZAP := /Applications/ZAP.app
 RUN_ZAP_COMMAND := open $(OWASP_ZAP) --args
 RUNNING_ZAP := ps -Ao pid=,command= | awk -v zapcmd=$(OWASP_ZAP) '$$0 ~ zapcmd && $$2 != "awk" {print $$1;exit}'
 
