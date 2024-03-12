@@ -34,7 +34,7 @@ ifneq "$(findstring $(origin PROXY_PORT), $(SPECIFIED))" ""
 RUN_ZAP_COMMAND += -port $(PROXY_PORT)
 endif
 
-start: debugging.pac zap.pid server.pid
+start: server.pid zap.pid
 
 shutdown: stop quit-zap stop-server
 
@@ -84,7 +84,7 @@ zap.pid: .FORCE
 	   $(RUN_ZAP_COMMAND) && $(RUNNING_ZAP) > zap.pid; \
 	 fi; unset -v PID
 
-server.pid:
+server.pid: debugging.pac
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
 	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PORT)/debugging.pac
 
