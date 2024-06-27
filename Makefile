@@ -16,7 +16,7 @@ RUNNING_ZAP := ps -Ao pid=,command= | awk -v zapcmd=$(OWASP_ZAP) '$$0 ~ zapcmd &
 # Start a new session or use existing session
 ifneq "$(wildcard $(SESSION))" ""
 # Given session is an existing file
-RUN_ZAP_COMMAND += -session "$(SESSION)"
+RUN_ZAP_COMMAND += -session "$(abspath $(SESSION))"
 else
 # Try session with given name in current directory
 SESSION_PATH = $(abspath $(SESSION).session)
