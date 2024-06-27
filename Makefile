@@ -7,7 +7,6 @@ PROXY_HOST ?= 127.0.0.1
 PROXY_PORT ?= 8088
 PROXY_ADDRESS := $(PROXY_HOST):$(PROXY_PORT)
 
-start:
 SESSION ?= $(CURDIR)/app_debugging
 OWASP_ZAP := /Applications/ZAP.app
 RUN_ZAP_COMMAND := open $(OWASP_ZAP) --args
