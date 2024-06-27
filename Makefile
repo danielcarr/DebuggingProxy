@@ -43,17 +43,21 @@ stop:
 stop-server:
 	@if test -f server.pid; then \
 	   read PID<server.pid; \
-	   kill $${PID} 2>/dev/null && rm server.pid || echo "Failed to stop server (pid = $${PID})" >&2; \
+	   kill $$PID 2>/dev/null && rm server.pid || echo "Failed to stop server (pid = $$PID)" >&2; \
 	 fi; unset -v PID
 
 quit-zap:
 	@if test -f zap.pid; then \
 	   read PID<zap.pid; rm zap.pid; \
-	   kill $${PID} 2>/dev/null || echo "Failed to close ZAP (pid = $${PID})" >&2; \
-	   PID=`$(RUNNING_ZAP)`; echo "Trying again with running ZAP (pid = $${PID})" >&2; \
-	   kill $${PID} 2>/dev/null; \
+	   kill $$PID 2>/dev/null || echo "Failed to close ZAP (pid = $$PID)" >&2; \
+	   PID=`$(RUNNING_ZAP)`; \
+	   if test $$PID && test $$PID != $$$$; then \
+	   	 echo "Trying again with running ZAP (pid = $$PID)" >&2; \
+		 kill $$PID 2>/dev/null; \
+	   fi; \
 	 else \
-	   kill `$(RUNNING_ZAP)` 2>/dev/null; \
+	   PID=`$(RUNNING_ZAP)`; \
+	   test $$PID && test $$PID != $$$$ && kill $$PID 2>/dev/null; \
 	 fi; unset -v PID
 
 restart: shutdown start
@@ -75,13 +79,14 @@ urls.conf:
 
 zap.pid: .FORCE
 	@PID=`$(RUNNING_ZAP)`; \
-	 if test $${PID}; then \
-	   if test ! -f zap.pid || test $${PID} != $$(<zap.pid); then \
-	     echo $${PID} > zap.pid; \
-	   fi; \
-	 else \
-	   $(RUN_ZAP_COMMAND) && $(RUNNING_ZAP) > zap.pid; \
-	 fi; unset -v PID
+	if test $$PID != $$$$; then \
+	  if test ! -f zap.pid || test $$PID != $$(<zap.pid); then \
+		echo "ZAP is already running. Updating pid to $$PID"; \
+	    echo $$PID > zap.pid; \
+	  fi; unset -v PID; \
+	else \
+	  $(RUN_ZAP_COMMAND) && $(RUNNING_ZAP) > zap.pid; \
+	fi
 
 server.pid: debugging.pac
 	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
