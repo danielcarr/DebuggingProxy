@@ -9,7 +9,10 @@
 *.session.tmp
 
 # Certificates
+certificates/
 *.cer
+*.der
+*.pem
 
 # Generated Files
 urls.conf
