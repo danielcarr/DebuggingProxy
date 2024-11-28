@@ -1,13 +1,13 @@
 import org.parosproxy.paros.network.HttpMessage
 
 /*
-The response of the endpoint that ends in `pattern` will be replaced with `body`. 
+The response of the endpoint that ends in `pattern` will be replaced with `body`.
 */
 
 boolean proxyResponse(HttpMessage msg) {
-    pattern = ''
+    pattern = $//$
     url = msg.getRequestHeader().getURI().toString()
-    if (url ==~ $/.*$/$pattern/$) {
+    if (url ==~ /.*\/$pattern/) {
         body = $/\
 
         /$.stripIndent()
