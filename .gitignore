@@ -16,9 +16,9 @@ certificates/
 
 # Generated Files
 urls.conf
-debugging.pac
 server.pid
 zap.pid
+*.pac
 
 # macOS Metadata
 .DS_Store
