@@ -1,6 +1,6 @@
 .PHONY: start stop shutdown stop-server quit-zap restart clean
 
-PORT ?= 8888
+PAC_PORT ?= 8888
 NETWORK ?= Wi-Fi
 
 PROXY_HOST ?= 127.0.0.1
@@ -66,11 +66,17 @@ clean: shutdown
 	@rm debugging.pac
 
 debugging.pac: urls.conf
-	@echo "function FindProxyForURL(url, host) {" > debugging.pac; \
-	 while read url; do \
-	   echo "  if (shExpMatch(host, \"$${url}\")) { return \"PROXY $(PROXY_ADDRESS)\"; }" >> debugging.pac; \
-	 done <urls.conf; \
-	 echo "  return \"DIRECT\";\n}" >> debugging.pac
+	@{ \
+	echo "const hostsToIntercept = ["; \
+	while read url; do \
+	echo "  '$$url',"; \
+	done <urls.conf; \
+	echo "];"; \
+	echo "function FindProxyForURL(url, host) {"; \
+	echo "  return hostsToIntercept.includes(host) ?"; \
+	echo "    'PROXY $(PROXY_ADDRESS)' : 'DIRECT';"; \
+	echo "}"; \
+	} >debugging.pac
 
 urls.conf:
 	@echo "Enter url patterns to proxy (leave out scheme; * can be used as a wildcard),\n\
@@ -89,7 +95,7 @@ zap.pid: .FORCE
 	fi
 
 server.pid: debugging.pac
-	@python3 -m http.server $(PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
-	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PORT)/debugging.pac
+	@python3 -m http.server $(PAC_PORT) --bind 127.0.0.1 2>/dev/null & echo $$! > server.pid
+	@networksetup -setautoproxyurl "$(NETWORK)" http://127.0.0.1:$(PAC_PORT)/debugging.pac
 
 .FORCE:
